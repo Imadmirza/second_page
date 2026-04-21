@@ -1,0 +1,1164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mi Horizon Cipla – Employee Self-Service</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue-dark: #1a3a6b;
+    --blue-mid:  #1565c0;
+    --teal:      #00a896;
+    --pink:      #e6007e;
+    --orange:    #f5a623;
+    --bg:        #dceef8;
+    --sidebar-bg:#005BA6;
+    --text-dark: #1a2a3a;
+    --card-radius: 12px;
+  }
+
+  html, body { height: 100%; overflow: auto; }
+
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: var(--bg);
+    color: var(--text-dark);
+    height: 100vh;
+    display: flex;
+    overflow: hidden;
+  }
+
+  /* ─────────── SIDEBAR ─────────── */
+  .sidebar {
+    width: 72px; background: var(--sidebar-bg);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 18px 0 24px;
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 100;
+  }
+  .sidebar-logo {
+    width: 40px; height: 40px; margin-bottom: 18px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .sidebar-item {
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px; padding: 12px 8px; cursor: pointer; width: 100%;
+    color: rgba(255,255,255,0.6); font-size: 8px;
+    font-family: 'Poppins', sans-serif; font-weight: 600;
+    transition: background .2s; text-align: center;
+  }
+  .sidebar-item a {
+  text-decoration: none;
+  color: inherit;
+  }
+  .sidebar-item:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .sidebar-item.active { color: #fff; }
+  .sidebar-item .icon-wrap {
+    width: 40px; height: 40px;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: 10px;
+  }
+  .sidebar-item.active .icon-wrap { background: rgba(255,255,255,0.15); }
+  .sidebar-item svg { width: 22px; height: 22px; }
+  .sidebar-item img { width: 22px; height: 22px; object-fit: contain; filter: brightness(0) invert(1); opacity: 0.7; }
+  .sidebar-item:hover img, .sidebar-item.active img { opacity: 1; }
+
+  /* ── Region dropdown ── */
+  .region-dropdown {
+    position: absolute; left: 76px; bottom: 10px;
+    background: #005BA6; border-radius: 10px;
+    min-width: 165px; box-shadow: 0 8px 28px rgba(0,0,0,0.32);
+    overflow: hidden; z-index: 200;
+    opacity: 0; pointer-events: none;
+    transform: translateX(-6px);
+    transition: opacity .2s, transform .2s;
+  }
+  .region-dropdown.open { opacity: 1; pointer-events: all; transform: translateX(0); }
+  .region-dropdown-item {
+    padding: 11px 18px; color: rgba(255,255,255,0.75);
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; gap: 8px;
+    transition: background .15s, color .15s; text-decoration: none;
+  }
+  .region-dropdown-item:hover { background: rgba(255,255,255,0.12); color: #fff; }
+  .region-dropdown-item.selected { color: #fff; }
+  .region-dropdown-item .check { font-size: 13px; width: 14px; flex-shrink: 0; }
+
+  /* wrapper so dropdown can be positioned relative to region item */
+  .region-wrap { position: relative; width: 100%; }
+
+  /* ─────────── LAYOUT ─────────── */
+  .main-wrapper {
+    margin-left: 72px; flex: 1;
+    display: flex; height: 100vh; overflow: hidden;
+  }
+  .content-grid {
+    display: grid; grid-template-columns: 2fr 1fr;
+    flex: 1; height: auto; overflow: hidden;
+  }
+
+  /* ─────────── LEFT PANEL ─────────── */
+  .left-panel {
+    padding: 18px 18px 16px;
+    display: flex; flex-direction: column; gap: 14px;
+    height: auto; overflow-y: auto; overflow-x: hidden; min-height: 100vh;
+    background: #fff;
+  }
+  .left-panel::-webkit-scrollbar { width: 4px; }
+  .left-panel::-webkit-scrollbar-thumb { background: #b0ccec; border-radius: 4px; }
+
+  /* Search bar — full width, compact */
+  .left-topbar {
+    flex-shrink: 0;
+  }
+  .search-bar-left {
+    width: 100%; background: #fff; border: 1.5px solid #c9dff5;
+    border-radius: 8px; padding: 7px 14px;
+    display: flex; align-items: center; gap: 8px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  }
+  .search-bar-left input {
+    border: none; outline: none; background: none;
+    font-size: 13px; color: #333; width: 100%;
+    font-family: 'Poppins', sans-serif;
+  }
+  .search-bar-left input::placeholder { color: #aaa; }
+  .search-bar-left svg { flex-shrink: 0; }
+
+  /* Welcome title */
+  .welcome-heading {
+    font-family: 'Poppins', sans-serif; font-size: 20.64px; font-weight: 600;
+    color: var(--blue-mid); flex-shrink: 0; line-height: 1.3; width: 542px; height: 21px; ; letter-spacing: 0px;
+  }
+
+  /* ── Quick Action Apps card ── */
+  .qa-card {
+    background: #fff; border-radius: var(--card-radius);
+    padding: 16px 18px; flex-shrink: 0;
+    box-shadow: 0 2px 10px rgba(0,48,135,0.07);
+    display: block;
+    width: 100%;
+  }
+  .qa-card-title {
+    font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+    color: var(--text-dark); margin-bottom: 14px; width: 183.65px; line-height: 150%; letter-spacing: 0;
+  }
+  .lower-card-title {
+    font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+    color: var(--text-dark); margin-bottom: 14px; width: 183.65px; line-height: 150%; letter-spacing: 0;
+  }
+
+
+  .qa-row {
+    display: flex; align-items: flex-start; gap: 10px; justify-content: flex-start; flex-wrap: wrap;
+  }
+  .qa-app {
+    display: flex; flex-direction: column; align-items: flex-start;
+    gap: 6px; width: 90px; padding: 0;
+  }
+  .qa-icon {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .2s, box-shadow .2s; flex-shrink: 0;
+  }
+  .qa-icon:hover { transform: translateY(-2px); box-shadow: 0 7px 18px rgba(0,0,0,0.16); }
+  .qa-icon svg { width: 28px; height: 28px; fill: #fff; }
+  .qa-icon.pink { background: none; }
+  .qa-icon img { width: 50px !important; height: 50px !important; border-radius: 50%; object-fit: cover; }
+
+  .qa-name {
+    font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 500;
+    color: var(--text-dark); text-align: left; width: 78.62px; line-height: 11.73px; letter-spacing: 0.06px;
+  }
+  .qa-tags { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; width: 100%; }
+  .qa-name,
+  .goal-label {
+  font-weight: 600 !important; /* normal text */
+  }
+
+  .qa-app img,
+ .goal-app img {
+  width: 78.62px !important;
+  height: 70.41px !important;
+  border-radius: 9.39px;
+  object-fit: contain;
+  display: block;
+  }
+
+  .tag {
+  font-size: 10px;
+  font-weight: 500;   /* 👈 not bold */
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+  font-family: 'Poppins', sans-serif;
+  cursor: pointer;
+  color: #fff;
+}
+
+/* 🔴 Quick Action Apps */
+.qa-card .tag {
+  background: #F49AC1 !important;
+    color: #000;
+}
+
+/* 🔵 Growth + Goals */
+.lower-row .lower-card:nth-child(1) .tag,
+.lower-row .lower-card:nth-child(2) .tag,
+.lower-row .lower-card:nth-child(3) .tag {
+  background: #005BA6 !important;
+}
+
+/* 🟠 IT Help */
+.lower-row .lower-card:nth-child(4) .tag {
+  background: #FBB03F !important;
+}
+
+  /* vertical divider between apps */
+  .qa-divider {
+    display: none;
+  }
+
+  /* Add button + hint */
+  .qa-add-group {
+    display: flex; align-items: center; gap: 10px; padding-left: 10px; flex-shrink: 0;
+  }
+  .add-circle {
+    width: 46px; height: 46px; border-radius: 50%;
+    border: 2px dashed #b0c8e8; background: #f0f6fd;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: #aac0e0; font-size: 26px; line-height: 1;
+    transition: border-color .2s, color .2s; flex-shrink: 0;
+  }
+  .add-circle:hover { border-color: var(--blue-mid); color: var(--blue-mid); }
+  .add-hint-box {
+    background: #fffbf0; border: 1px solid #ffe082; border-radius: 10px;
+    padding: 9px 12px; font-size: 10px; color: #666; line-height: 1.5;
+    max-width: 130px; text-align: center;
+  }
+
+
+  /* 🔹 Quick Action Apps (qa-app) */
+.qa-app {
+  width: 120px;
+  height: 210px;
+  background: #D9D9D933;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.qa-app:hover {transform: translateY(-4px); box-shadow: 0 10px 22px rgba(0,0,0,0.15);}
+
+/* 🔹 Goal Apps */
+.goal-app {
+  width: 120px;
+  height: 170px;
+  background: #D9D9D933;
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 5px;
+}
+.goal-app:hover {transform: translateY(-4px); box-shadow: 0 10px 22px rgba(0,0,0,0.15);}
+
+
+  /* ── Lower 3-col section ── */
+  .lower-row {
+    display: grid; grid-template-columns: 1fr 2fr 1fr 1fr;
+    gap: 10px; flex-shrink: 0;
+    margin-top: 24px;
+  }
+  .lower-card {
+    background: #fff; border-radius: var(--card-radius);
+    padding: 14px 14px; box-shadow: 0 2px 10px rgba(0,48,135,0.07);
+  }
+
+  /* Growth Apps — single app column */
+  .growth-app {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+  }
+  .app-icon-circle {
+    width: 54px; height: 54px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .2s, box-shadow .2s;
+  }
+  .app-icon-circle:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
+  .app-icon-circle svg { width: 26px; height: 26px; fill: #fff; }
+  .app-icon-circle.blue   { background: linear-gradient(135deg, #60a5fa, var(--blue-mid)); }
+  .app-icon-circle.orange { background: linear-gradient(135deg, #fbbf24, var(--orange)); }
+
+  .app-label {
+    font-family: 'Poppins', sans-serif; font-size: 11px; font-weight: 800;
+    color: var(--text-dark); text-align: left; white-space: nowrap;
+  }
+  .app-tags { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+
+  /* Goals row — 4 apps in a row */
+
+  .goals-row {
+  display: grid;
+  grid-template-columns: repeat(3, auto);
+  gap: 12px;
+  justify-content: center;
+}
+
+  .qa-row {
+  display: grid;
+  grid-template-columns: repeat(4, auto); /* 4 apps */
+  gap: 12px; /* adjust as per Figma */
+  justify-content: flex-start; /* or center */
+}
+
+  .goal-icon {
+    width: 50px; height: 50px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; transition: transform .2s, box-shadow .2s;
+  }
+  .goal-icon:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.14); }
+  .goal-icon svg { width: 24px; height: 24px; fill: #fff; }
+  .goal-label {
+    font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 800;
+    color: var(--text-dark); text-align: left; white-space: nowrap;
+  }
+  .goal-tags { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
+
+  /* IT Help — left-aligned single app */
+  .it-app {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
+  }
+
+  /* Growth App — left-aligned */
+  .growth-app {
+    display: flex; flex-direction: column; align-items: flex-start; gap: 7px;
+  }
+
+  /* ── Explore buttons ── */
+  .explore-row {
+    display: flex; gap: 12px; flex-shrink: 0; padding-bottom: 4px;
+  }
+  .btn-explore {
+    padding: 10px 22px; border-radius: 22px;
+    font-family: 'Poppins', sans-serif; font-size: 12px; font-weight: 600;
+    cursor: pointer; border: none; transition: background .2s;
+  }
+  .btn-explore.primary   { background: #0055B8; color: #fff; }
+  .btn-explore.primary:hover { background: #122d55; }
+  .btn-explore.secondary { background: var(--blue-mid); color: #fff; }
+  .btn-explore.secondary:hover { background: #0d47a1; }
+
+  .explore-container {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-start; /* keep same position */
+  }
+
+  .explore-container .explore-row {
+  flex: none; /* ❌ prevent shrink/stretch */
+  }
+
+  .btn-explore {
+  white-space: nowrap;   /* ✅ prevent text breaking */
+  }
+
+  /* ─────────── RIGHT PANEL ─────────── */
+  .right-panel {
+    background: #f0f5fb;
+    border-left: 1px solid rgba(0,0,0,0.07);
+    display: flex; flex-direction: column;
+    height: 100vh; overflow-y: auto; overflow-x: hidden;
+  }
+  .right-panel::-webkit-scrollbar { width: 4px; }
+  .right-panel::-webkit-scrollbar-thumb { background: #b0ccec; border-radius: 4px; }
+
+  /* HR Updates title */
+  .hr-section-title {
+    font-family: 'Poppins', sans-serif; font-size: 15px; font-weight: 600;
+    color: var(--text-dark); padding: 14px 16px 10px;
+    flex-shrink: 0;
+  }
+
+  /* ── HR Image Carousel — card-sized ── */
+  .hr-carousel-wrap {
+  position: relative;
+  margin: 0 14px 14px;
+  border-radius: 12px;
+  overflow: hidden;
+  flex-shrink: 0;
+  box-shadow: 0 3px 14px rgba(0,48,135,0.12);
+  aspect-ratio: 771 / 504;   /* 🔥 best fix */
+}
+  .hr-track {
+    display: flex; height: 100%;
+    transition: transform 0.6s cubic-bezier(.77,0,.18,1);
+    will-change: transform;
+  }
+  .hr-slide {
+  width: 100%;
+  height: 100%;
+  flex-shrink: 0;
+  display: block;
+
+  background-size: contain;   /* 🔥 change here */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #fff;     /* optional: fills empty space nicely */
+}
+  .hr-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    background: rgba(0,0,0,0.25); backdrop-filter: blur(4px);
+    border: none; color: #fff;
+    width: 28px; height: 28px; border-radius: 50%;
+    font-size: 18px; cursor: pointer; z-index: 5;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .2s; padding: 0; line-height: 1;
+  }
+  .hr-btn:hover { background: rgba(0,0,0,0.5); }
+  .hr-btn.prev { left: 8px; }
+  .hr-btn.next { right: 8px; }
+  .hr-dots {
+    position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+    display: flex; gap: 6px; z-index: 5;
+  }
+  .hr-dot {
+    width: 6px; height: 6px; border-radius: 50%; border: none; cursor: pointer;
+    background: rgba(255,255,255,0.5);
+    transition: background .3s, transform .3s;
+  }
+  .hr-dot.active { background: #fff; transform: scale(1.35); }
+
+  /* POLICY SECTION */
+.policy-section {
+  padding: 0 14px 16px;
+}
+
+.policy-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin: 10px 0;
+  color: #231F20;
+}
+
+.policy-header {
+  background: #F49AC1;
+  border-radius: 10px;
+  padding: 12px 14px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  cursor: pointer;
+}
+
+.policy-main {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.policy-sub {
+  font-size: 10px;
+  margin-top: 2px;
+}
+
+.policy-icon {
+  width: 40px;
+  height: 40px;
+  background: #fff;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.policy-icon img {
+  width: 22px;
+}
+
+.policy-body {
+  display: flex;
+  gap: 10px;
+}
+
+.policy-side {
+  display: flex;
+  align-items: center;
+  border-left: 1px dashed #000;
+  padding-left: 6px;
+}
+
+.policy-side span {
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  font-size: 10px;
+}
+
+.policy-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.policy-card {
+  background: #F49AC1;
+  border-radius: 10px;
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.policy-doc-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.policy-doc-icon img {
+  width: 70%;
+  height: 70%;
+  object-fit: contain;
+}
+
+.policy-name {
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.policy-date {
+  font-size: 9px;
+}
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 1000px) {
+    .content-grid { grid-template-columns: 1fr; height: auto; overflow: visible; }
+    .main-wrapper  { height: auto; overflow: visible; }
+    body           { height: auto; overflow: auto; }
+    .left-panel    { height: auto; overflow: visible; display: flex; flex-direction: column; }
+    .right-panel   { height: auto; border-left: none; border-top: 2px solid rgba(0,0,0,0.06); }
+    .lower-row     { grid-template-columns: 1fr 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .main-wrapper { margin-left: 0; }
+    .sidebar { display: none; }
+    .lower-row { grid-template-columns: 1fr; }
+    .goals-row { flex-wrap: wrap; justify-content: center; }
+    .explore-row { flex-wrap: wrap; }
+  }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+
+<!-- Home -->
+<div class="sidebar-item active">
+  
+  <div class="icon-wrap">
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home" target="_blank">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/eb975205cf0e4155b28d/Icon.png" alt="Home">
+    </a>
+  </div>
+
+  <div>
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home" target="_blank">
+      Home
+    </a>
+  </div>
+
+</div>
+
+<!-- Employee Self-Service -->
+<div class="sidebar-item" style="margin-top:8px;">
+  
+  <div class="icon-wrap">
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#Cipla-ESS?sap-app-origin-hint=&sap-ui-app-id-hint=12a3af88-57f9-46da-8255-2f4df348b538" target="_blank">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/8f7162e124ec47978655/Grid.png" alt="Employee Self-Service">
+    </a>
+  </div>
+
+  <div>
+    <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#Cipla-ESS?sap-app-origin-hint=&sap-ui-app-id-hint=12a3af88-57f9-46da-8255-2f4df348b538" target="_blank">
+      Employee<br>Self-Service
+    </a>
+  </div>
+
+</div>
+
+  <!-- Region -->
+  <div class="region-wrap" style="margin-top:8px;">
+    <div class="sidebar-item" id="regionBtn" onclick="toggleRegionDropdown(event)">
+      <div class="icon-wrap">
+        <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/82cec4bb0cc545c39624/Group114.png" alt="Region">
+      </div>
+      <div>
+        Region<br><span id="regionLabel">India</span>
+      </div>
+    </div>
+
+    <div class="region-dropdown" id="regionDropdown">
+      <div class="region-dropdown-item selected">
+        <span class="check">✓</span> India
+      </div>
+
+      <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/x4FnQ571eHJHvzbSVID024" target="_blank">
+        <span class="check"></span> EMEU
+      </a>
+
+      <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/WGc33O2txB9Gbr9W4q6024" target="_blank">
+        <span class="check"></span> One Africa
+      </a>
+
+            <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/HPbQWT5ON9bPuxXwLle024" target="_blank">
+        <span class="check"></span> Subsidiaries
+      </a>
+
+            <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/Xuxy9NBhoBEb28U7zMo024" target="_blank">
+        <span class="check"></span> CHL
+      </a>
+
+      <a class="region-dropdown-item" href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home/Ey6nC87CwetoasFLo0f024" target="_blank">
+        <span class="check"></span> North America
+      </a>
+    </div>
+  </div>
+
+<!-- MiDas -->
+<div class="sidebar-item" style="margin-top:8px;">
+  
+  <div class="icon-wrap">
+    <a href="https://web.leena.ai/v2/?clientId=6FzCIUNhpefA_Okufvjnf" target="_blank">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/22052b563e484ad5b4ce/icons.png"
+           alt="MiDas"
+           style="filter:none !important; opacity:1 !important; width:34px; height:34px;">
+    </a>
+  </div>
+
+  <div>
+    <a href="https://web.leena.ai/v2/?clientId=6FzCIUNhpefA_Okufvjnf" target="_blank">
+      MiDas
+    </a>
+  </div>
+
+</div>
+
+</nav>
+
+<!-- ── MAIN ── -->
+<div class="main-wrapper">
+  <div class="content-grid">
+
+    <!-- ════════ LEFT PANEL ════════ -->
+    <div class="left-panel">
+
+      <!-- Search bar -->
+<div class="search-bar-left" style="position:relative;">
+  
+  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#bbb" stroke-width="2.5">
+    <circle cx="11" cy="11" r="8"/>
+    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+  </svg>
+
+  <input id="appSearch" type="text" placeholder="Search for payslips, leaves, expenses…">
+
+  <!-- ❌ CLEAR BUTTON -->
+  <span id="clearSearch" style="
+    position:absolute;
+    right:12px;
+    cursor:pointer;
+    font-size:14px;
+    color:#999;
+    display:none;
+  ">✕</span>
+
+  <!-- 🔽 DROPDOWN -->
+  <div id="searchDropdown" style="
+    position:absolute;
+    top:38px;
+    left:0;
+    right:0;
+    background:#fff;
+    border:1px solid #e0ecf7;
+    border-radius:8px;
+    box-shadow:0 6px 18px rgba(0,0,0,0.1);
+    display:none;
+    z-index:999;
+    max-height:220px;
+    overflow-y:auto;
+  "></div>
+
+</div>
+
+      <!-- Welcome heading -->
+      <div class="welcome-heading">Hey, Welcome to My Employee Self-Service</div>
+
+      <!-- Quick Action Apps -->
+      <div class="qa-card">
+        <div class="qa-card-title">My Quick Action Apps</div>
+        <div class="qa-row">
+          
+
+
+          <!-- Mi Time -->
+          <div class="qa-app" onclick="openApp('https://cipla.peoplestrong.com/secureSloginRedirect.jsf?organizationId=229&idp=azure')">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/10b7b6c550d346669ebf/MiTime.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi Time">
+            <span class="qa-name">MiTime</span>
+            <div class="qa-tags">
+              <span class="tag green">Leaves</span>
+              <span class="tag pink">Time</span>
+              <span class="tag blue">Attendance</span>
+              <span class="tag blue">Holiday Calendar</span>
+            </div>
+          </div>
+
+          <div class="qa-divider"></div>
+
+
+          <!-- Mi Pay -->
+          <div class="qa-app" onclick="openApp('https://myapps.microsoft.com/signin/53369dbe-d581-4aa9-a7ab-9d3e1e38ae24?tenantId=e6fd9f9f-6c49-4254-b8e8-90fba073cceb')">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/6b745e83efa248c586dd/MiPay.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi Pay">
+            <span class="qa-name">MiPay</span>
+            <div class="qa-tags">
+              <span class="tag green">Salary slip</span>
+              <span class="tag green">IT declaration</span>
+              <span class="tag pink">Choice Pay</span>
+              <span class="tag blue">Childcare</span>
+            </div>
+          </div>
+
+          <div class="qa-divider"></div>
+
+
+          <!-- Mi Expenses -->
+          <div class="qa-app" onclick="openApp('https://iexpense.cipla.com/mscallback.do')">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/93309673c03e4113955a/travelnew.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi Expenses">
+            <span class="qa-name">MiTravel & Reimbursements</span>
+            <div class="qa-tags">
+              <span class="tag blue">Travel booking</span>
+              <span class="tag pink">Reimbursement</span>
+            </div>
+          </div>
+
+          <div class="qa-divider"></div>
+
+          <!-- Mi Benefits -->
+          <div class="qa-app" onclick="openApp('https://massist.in/c1kfq29')">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/39496fc7620f4b90bb3b/MiBenefits.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi Benefits">
+            <span class="qa-name">MiBenefits</span>
+            <div class="qa-tags">
+              <span class="tag blue">Medical insurane</span>
+              <span class="tag green">Network hospital</span>
+              <span class="tag teal">Claim processing</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Lower 3-col: Growth | Goals | IT Help -->
+      <div class="lower-row">
+
+        <!-- Growth Apps -->
+        
+
+        <!-- Goals, Performance, Learning Apps -->
+        <div class="lower-card">
+          <div class="lower-card-title">People & Organization</div>
+          <div class="goals-row">
+            <div class="goal-app" onclick="openApp('https://performancemanager10.successfactors.com/sf/pmreviews?bplte_company=C0001172882P')">
+              <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/8a7bf2391e59448bb4e2/perf.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi DNA Goals">
+              <span class="goal-label">Performance</span>
+              <div class="goal-tags">
+                <span class="tag blue">Annual Review</span>
+                <span class="tag pink">Regular Checkins</span>
+              </div>
+            </div>
+            <div class="goal-app" onclick="openApp('https://performancemanager10.successfactors.com/sf/personalinfo?company=C0001172882P')">
+              <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/dd82bfa5ef314c2dafa6/MiProfile_new.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi Performance">
+              <span class="goal-label">MiProfile & <br> Mi  SelfService</span>
+              <div class="goal-tags">
+                <span class="tag blue">Employee Profile</span>
+                <span class="tag pink">Self Service</span>
+              </div>
+            </div>
+            <div class="goal-app" onclick="openApp('https://performancemanager10.successfactors.com/sf/goals?company=C0001172882P')">
+              <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/92a8b4e725d044e498cc/Goals_new.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Mi Learning">
+              <span class="goal-label">Goals</span>
+              <div class="goal-tags">
+                <span class="tag blue">Goal<br> Management</span>
+                <span class="tag pink">Goal Checkins</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Learning Apps -->
+        <div class="lower-card">
+          <div class="lower-card-title">Learning</div>
+          <div class="goals-row" style="grid-template-columns: repeat(2, auto);">
+            <div class="goal-app" onclick="openApp('https://ciplalimit.plateau.com/learning/user/personal/landOnPortalHome.do?OWASP_CSRFTOKEN=8VK6-8FPG-Q5TC-68RB-RYDK-XEGE-WSEE-XMBV&fromSF=Y&fromDeepLink=true&pageID=')">
+              <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/db2cd0ac4bc4400d976f/milearningwhite.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Performance">
+              <span class="goal-label">MiLearning (LMS)</span>
+              <div class="goal-tags">
+                <span class="tag blue">Learning modules</span>
+                <span class="tag blue">Mandatory<br>trainings</span>
+              </div>
+            </div>
+            <div class="goal-app" onclick="openApp('https://performancemanager10.successfactors.com/sf/goals?company=C0001172882P')">
+              <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/6f88e91d381649d49838/LearningCalendar1.png" style="width:50px;height:50px;object-fit:contain;cursor:pointer;flex-shrink:0;" alt="Goals">
+              <span class="goal-label">Learning Calendar</span>
+              <div class="goal-tags">
+                <span class="tag blue">Curated Calendar</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- IT Help App -->
+        
+
+      </div><!-- end lower-row -->
+
+      <div class="explore-container">
+
+                <div class="explore-row" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#Cipla-ESS2?sap-app-origin-hint=&sap-ui-app-id-hint=7ae603a7-c1fd-4069-9be0-cb9e03f0b6fb')">
+                  <button class="btn-explore primary">Explore all Apps &nbsp;›</button>
+                </div>
+
+                <div class="explore-row" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#Cipla-ESS2?sap-app-origin-hint=&sap-ui-app-id-hint=7ae603a7-c1fd-4069-9be0-cb9e03f0b6fb')">
+                   <button class="btn-explore primary">Explore My Department Apps &nbsp;›</button>
+                </div>
+
+      </div>
+
+    </div><!-- end left-panel -->
+
+    <!-- ════════ RIGHT PANEL — HR Updates Image Carousel ════════ -->
+<div class="right-panel">
+  <div class="hr-section-title">HR Updates</div>
+
+  <div class="hr-carousel-wrap">
+    <div class="hr-track" id="hrTrack">
+
+      <a href="https://xujumwkftrdyf6nhorx000.ap10-1.dws.workzone.ondemand.com/embedded_images/show/ZV9QCxmJg4QbQyBuLpa024/thumbnail?max_x=1176&max_y=0" target="_blank" class="hr-slide"
+         style="background-image:url('https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/a0e826d89dff4363acd5/thumbnaillll.png');">
+      </a>
+
+      <a href="https://xujumwkftrdyf6nhorx000.ap10-1.dws.workzone.ondemand.com/embedded_images/show/ivplO3ILhshfsVBlaRi024/thumbnail?max_x=1176&max_y=0" target="_blank" class="hr-slide"
+         style="background-image:url('https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c24584180e6946ef90e1/thumbnailx2.jpg');">
+      </a>
+
+      <a href="https://xujumwkftrdyf6nhorx000.ap10-1.dws.workzone.ondemand.com/embedded_images/show/oMAUY3T2esxNOZS3SdC024/thumbnail?max_x=1176&max_y=0" target="_blank" class="hr-slide"
+         style="background-image:url('https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/d1fbfefc24a341f883d8/epfo.png');">
+      </a>
+
+      <a href="https://xujumwkftrdyf6nhorx000.ap10-1.dws.workzone.ondemand.com/embedded_images/show/bdIyfLQ1utx1Kaddwlh024/thumbnail?max_x=1176&max_y=0" target="_blank" class="hr-slide"
+         style="background-image:url('https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/7ed21f8176304f029d3a/thumbnailx4.jpg');">
+      </a>
+
+    </div>
+
+    <button class="hr-btn prev" onclick="moveHR(-1)">&#8249;</button>
+    <button class="hr-btn next" onclick="moveHR(1)">&#8250;</button>
+    <div class="hr-dots" id="hrDots"></div>
+  </div>
+
+  <!-- ✅ POLICY SECTION START -->
+  <div class="policy-section">
+
+    <div class="policy-title">Policy Document Updates</div>
+
+    <!-- Header -->
+    <div class="policy-header" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/workpage_tabs/ES7lhq0fypRxKa7yELQ024')">
+      <div>
+        <div class="policy-main">MiPolicies</div>
+        <div class="policy-sub">Show All Policies >></div>
+      </div>
+
+      <div class="policy-icon">
+        <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png">
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div class="policy-body">
+
+      <!-- Vertical label -->
+      <div class="policy-side">
+        <span>Recent Updates</span>
+      </div>
+
+      <!-- Cards -->
+      <div class="policy-list">
+
+        <div class="policy-card" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/documents/JVeyxQOnbEgdOWSFeGt024/slide_viewer')">
+          <div class="policy-doc-icon">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png" alt="doc">
+          </div>
+          <div>
+            <div class="policy-name">Domestic Travel Policy</div>
+          </div>
+        </div>
+
+        <div class="policy-card" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/documents/vuI0pZQuCCPpgScTD4Z024/slide_viewer')">
+          <div class="policy-doc-icon">
+           <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png" alt="doc">
+
+          </div>
+          <div>
+            <div class="policy-name">International Travel Policy</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+  <!-- ✅ POLICY SECTION END -->
+
+</div><!-- end right-panel -->
+
+
+</div>
+</div>
+
+<script>
+  // ── HR IMAGE CAROUSEL ──
+  const hrSlides = document.querySelectorAll('.hr-slide');
+  const hrTrack  = document.getElementById('hrTrack');
+  const hrDotsEl = document.getElementById('hrDots');
+  let hrCur = 0, hrTimer;
+
+  hrSlides.forEach((_, i) => {
+    const d = document.createElement('button');
+    d.className = 'hr-dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => { hrGoTo(i); hrResetAuto(); });
+    hrDotsEl.appendChild(d);
+  });
+
+  function hrGoTo(idx) {
+    hrCur = (idx + hrSlides.length) % hrSlides.length;
+    hrTrack.style.transform = `translateX(-${hrCur * 100}%)`;
+    document.querySelectorAll('.hr-dot').forEach((d, i) => 
+      d.classList.toggle('active', i === hrCur)
+    );
+  }
+
+  function moveHR(dir) { 
+    hrGoTo(hrCur + dir); 
+    hrResetAuto(); 
+  }
+
+  function hrResetAuto() { 
+    clearInterval(hrTimer); 
+    hrTimer = setInterval(() => hrGoTo(hrCur + 1), 4000); 
+  }
+
+  hrResetAuto();
+
+
+  // ── Animation ──
+  document.querySelectorAll('.qa-icon, .app-icon-circle, .goal-icon').forEach((el, i) => {
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    setTimeout(() => {
+      el.style.transition = 'opacity .3s, transform .3s';
+      el.style.opacity = '1';
+      el.style.transform = 'none';
+    }, 60 + i * 55);
+  });
+
+  function openApp(url) {
+    window.open(url, '_blank');
+  }
+
+  // ── Region dropdown ──
+  function toggleRegionDropdown(e) {
+    e.stopPropagation();
+    document.getElementById('regionDropdown').classList.toggle('open');
+  }
+
+  document.addEventListener('click', function(e) {
+    if (!document.getElementById('regionBtn').contains(e.target)) {
+      document.getElementById('regionDropdown').classList.remove('open');
+    }
+  });
+
+
+  /* ───────── GLOBAL APP DATA ───────── */
+
+  const appData = [
+    { name:"MiTime", tags:["Leaves","Time","Attendance","Holiday Calendar"], onclick:"openApp('https://myapps.microsoft.com/signin/53369dbe-d581-4aa9-a7ab-9d3e1e38ae24?tenantId=e6fd9f9f-6c49-4254-b8e8-90fba073cceb')" },
+    { name:"MiPay", tags:["Salary slip","IT declaration","Choice Pay","Childcare"], onclick:"openApp('https://myapps.microsoft.com/...')" },
+    { name:"MiTravel & Reimbursements", tags:["Travel booking","Reimbursement"], onclick:"openApp('https://iexpense.cipla.com/mscallback.do')" },
+    { name:"MiBenefits", tags:["Medical insurance","Network hospital","Claim processing"], onclick:"openApp('https://massist.in/c1kfq29')" },
+    { name:"Performance", tags:["Annual review","Regular Checkins"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/pmreviews?bplte_company=C0001172882P')" },
+    { name:"MiProfile & MiSelf-Service", tags:["Employee profile","Self Service"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/personalinfo?company=C0001172882P')" },
+    { name:"MiNomination", tags:["Retirals","Insurance","F&F"], onclick:"openApp('https://myapp.cipla.com/Nomination/')" },
+    { name:"Goals", tags:["Goal management","Goal Checkins"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/goals?company=C0001172882P')" },
+    { name:"MiHorizon", tags:["HR Information system","Employee Lifecycle"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/home?')" },
+    { name:"MiOrgChart", tags:["Org hierarchy","Position management","Job requisition"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/orgchart?company=C0001172882P')" },
+    { name:"MiLearning (LMS)", tags:["Learning modules","Mandatory trainings"], onclick:"openApp('https://ciplalimit.plateau.com/learning/user/personal/landOnPortalHome.do')" },
+    { name:"Learning Calendar", tags:["Curated Calendar"], onclick:"openApp('https://milearning.cipla.com')" },
+    { name:"Cipla University (Cornerstone)", tags:["Micro learning"], onclick:"openApp('https://Ciplamilearning.edcast.com')" },
+    { name:"MiRecruiting Turbohire", tags:["Hiring managers"], onclick:"openApp('https://cipla.turbohire.co/e/login')" },
+    { name:"MiRecruiting: RCM", tags:["Recruiters"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/recruiting?company=C0001172882P')" },
+    { name:"MiRecruiting: Turbohire", tags:["Recruiters"], onclick:"openApp('https://cipla.turbohire.co/login')" },
+    { name:"MiOnboarding", tags:["New joiner","Onboarding"], onclick:"openApp('https://cipla.tydy.co/')" },
+    { name:"MiCareers", tags:["Internal Job posting","Referral"], onclick:"openApp('https://performancemanager10.successfactors.com/sf/careers?company=C0001172882P')" },
+    { name:"MiVolunteering", tags:["Cipla for Change"], onclick:"openApp('https://mivolunteering.cipla.com/volunteer_events.aspx')" },
+    { name:"MiRecognition", tags:["Applause","Thanks"], onclick:"openApp('https://cipla.thanks.com/app/login/sso')" },
+    { name:"MiWellbeing", tags:["Private counselling","Mental health assessment","Mindfulness"], onclick:"openApp('https://www.amahahealth.com/auth/sso/')" },
+    { name:"MiEarned Salary", tags:["Realtime access","Earned Salary"], onclick:"openApp('https://app.refyne.co.in/#/loginRegister')" },
+    { name:"Banking Solutions", tags:["Bank Offers"], onclick:"openApp('https://jam10.sapjam.com/groups/...')" },
+    { name:"MiSeparation", tags:["eSeparation"], onclick:"openApp('https://performancemanager10.successfactors.com/...')" },
+    { name:"IT Helpdesk", tags:["iService"], onclick:"openApp('https://cipla.m42cloud.com/wm/')" },
+    { name:"JE Central", tags:["Role evaluation","Track roles","Job description"], onclick:"openApp('https://jecentral.cipla.com/')" },
+    { name:"People Analytics", tags:["Dashboards","HR Analytics"], onclick:"openApp('https://insights.cipla.com/')" },
+    { name:"Talent Central", tags:["Talent Review","Development Review"], onclick:"openApp('https://talentcentral.cipla.com')" },
+    { name:"ER Case Management", tags:["Track employee relation"], onclick:"openApp('https://ciplaltd.sharepoint.com/sites/EthicsCaseTracker')" },
+    { name:"Policy Review", tags:["Policy review mechanism"], onclick:"openApp('https://ciplaltd.sharepoint.com/sites/policyreview')" }
+  ];
+
+
+  /* ───────── SEARCH LOGIC ───────── */
+
+  const searchInput = document.getElementById('appSearch');
+  const dropdown = document.getElementById('searchDropdown');
+  const clearBtn = document.getElementById('clearSearch');
+
+  let processedApps = [];
+  let tagMap = {};
+
+  appData.forEach(app => {
+    const obj = {
+      name: app.name,
+      nameLower: app.name.toLowerCase(),
+      tags: app.tags,
+      tagsLower: app.tags.map(t => t.toLowerCase()),
+      onclick: app.onclick
+    };
+
+    processedApps.push(obj);
+
+    app.tags.forEach(tag => {
+      if (!tagMap[tag]) tagMap[tag] = [];
+      tagMap[tag].push(obj);
+    });
+  });
+
+  const allTags = Object.keys(tagMap);
+
+  searchInput.addEventListener('input', function () {
+    const query = this.value.toLowerCase().trim();
+
+    dropdown.innerHTML = '';
+    clearBtn.style.display = query ? 'block' : 'none';
+
+    if (!query) {
+      dropdown.style.display = 'none';
+      return;
+    }
+
+    const matchedTags = allTags.filter(tag =>
+      tag.toLowerCase().includes(query)
+    );
+
+    const matchedApps = processedApps.filter(app =>
+      app.nameLower.includes(query)
+    );
+
+    // TAG MODE
+    if (matchedTags.length > 0) {
+      matchedTags.forEach(tag => {
+
+        const tagItem = document.createElement('div');
+        tagItem.style.padding = '8px 12px';
+        tagItem.style.fontWeight = '600';
+        tagItem.style.color = '#1565c0';
+        tagItem.innerHTML = `🔖 ${tag}`;
+        dropdown.appendChild(tagItem);
+
+        tagMap[tag].forEach(app => {
+          const sub = document.createElement('div');
+          sub.style.padding = '6px 24px';
+          sub.style.cursor = 'pointer';
+          sub.innerHTML = `→ ${app.name}`;
+
+          sub.onclick = () => eval(app.onclick);
+          sub.onmouseover = () => sub.style.background = '#f0f6ff';
+          sub.onmouseout = () => sub.style.background = '#fff';
+
+          dropdown.appendChild(sub);
+        });
+      });
+
+      dropdown.style.display = 'block';
+      return;
+    }
+
+    // APP MODE
+    if (matchedApps.length > 0) {
+      matchedApps.forEach(app => {
+        const item = document.createElement('div');
+
+        item.style.padding = '8px 12px';
+        item.style.cursor = 'pointer';
+        item.innerHTML = app.name;
+
+        item.onclick = () => eval(app.onclick);
+        item.onmouseover = () => item.style.background = '#f0f6ff';
+        item.onmouseout = () => item.style.background = '#fff';
+
+        dropdown.appendChild(item);
+      });
+
+      dropdown.style.display = 'block';
+      return;
+    }
+
+    dropdown.style.display = 'none';
+  });
+
+  // ENTER
+  searchInput.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      const query = this.value.toLowerCase();
+      const match = processedApps.find(app =>
+        app.nameLower.includes(query)
+      );
+      if (match) eval(match.onclick);
+    }
+  });
+
+  // CLEAR
+  clearBtn.addEventListener('click', function () {
+    searchInput.value = '';
+    dropdown.style.display = 'none';
+    this.style.display = 'none';
+    searchInput.focus();
+  });
+
+  // OUTSIDE CLICK
+  document.addEventListener('click', function (e) {
+    if (!e.target.closest('.search-bar-left')) {
+      dropdown.style.display = 'none';
+    }
+  });
+
+</script>
+</body>
+</html>
