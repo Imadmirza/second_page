@@ -63,7 +63,7 @@
 
   /* ── Region dropdown ── */
   .region-dropdown {
-    position: absolute; left: 76px; bottom: 10px;
+    position: absolute; left: 91px; bottom: -179px;
     background: #005BA6; border-radius: 10px;
     min-width: 165px; box-shadow: 0 8px 28px rgba(0,0,0,0.32);
     overflow: hidden; z-index: 200;
@@ -91,7 +91,7 @@
     display: flex; height: 100vh; overflow: hidden;
   }
   .content-grid {
-    display: grid; grid-template-columns: 2fr 1fr;
+    display: grid; grid-template-columns: 2fr 0.9fr;
     flex: 1; height: auto; overflow: hidden;
   }
 
@@ -103,7 +103,7 @@
     background: #fff;
   }
   .left-panel::-webkit-scrollbar { width: 4px; }
-  .left-panel::-webkit-scrollbar-thumb { background: #b0ccec; border-radius: 4px; }
+  .left-panel::-webkit-scrollbar-thumb { background: #005BA6; border-radius: 4px; }
 
   /* Search bar — full width, compact */
   .left-topbar {
@@ -155,6 +155,7 @@
 
 .collapsible-content{
     padding-top:8px;
+    display: none;
 }
 
 .goals-row{
@@ -192,11 +193,12 @@
 
   .qa-app img,
  .goal-app img {
-  width: 78.62px !important;
-  height: 70.41px !important;
+  width: auto !important;
+  height: 80px !important;
   border-radius: 9.39px;
   object-fit: contain;
   display: block;
+  margin-bottom: 8px;
   }
 
   .tag {
@@ -208,7 +210,10 @@
   font-family: 'Poppins', sans-serif;
   cursor: pointer;
   color: #616161;
-  background: #EDF4FE;
+  background: none !important;
+  display: block;
+  text-align: center;
+  width: 100%;
 }
 
 /* 🔴 Quick Action Apps */
@@ -221,7 +226,7 @@
 .lower-row .lower-card:nth-child(1) .tag,
 .lower-row .lower-card:nth-child(2) .tag,
 .lower-row .lower-card:nth-child(3) .tag {
-  background: #EDF4FE !important;
+  background: none !important;
 }
 
 /* 🟠 IT Help */
@@ -274,7 +279,7 @@
 
 /* 🔹 Goal Apps */
 .goal-app {
-  width: 120px;
+  width: 98%;
   height: 190px;
   background: #fff;
   border-radius: 12px;
@@ -305,7 +310,7 @@
   }
   .lower-card {
     background: #fff; border-radius: var(--card-radius);
-    padding: 14px 14px;
+    padding: 0;
     margin-bottom: 10px;
   }
 
@@ -355,7 +360,7 @@
   .goal-icon svg { width: 24px; height: 24px; fill: #fff; }
   .goal-label {
     font-family: 'Poppins', sans-serif; font-size: 10px; font-weight: 800;
-    color: var(--text-dark); text-align: left; white-space: nowrap;
+    color: var(--text-dark); text-align: center; white-space: nowrap;
   }
   .goal-tags { display: flex; flex-direction: column; gap: 3px; align-items: flex-start; }
 
@@ -698,15 +703,27 @@
 
 .collapsible-header{
     display:flex;
-    justify-content:space-between;
+    justify-content:flex-start;
     align-items:center;
     cursor:pointer;
     user-select:none;
+    width: 100%;
+    padding: 14px 14px;
+    border-bottom: 1px solid #ececec;
+}
+
+.collapsible-header.active, .lower-card:nth-last-child(1) .collapsible-header{
+  border-bottom: 0;
 }
 
 .collapse-icon{
     font-size:14px;
     transition:transform .3s ease;
+    padding-left: 1.5em;
+}
+
+.collapse-icon img{
+  vertical-align: center;
 }
 
 .collapsible-content{
@@ -719,6 +736,19 @@
 
 .collapsible-content.collapsed{
     max-height:0;
+}
+
+.collapsible-content.open {
+    display: block;
+}
+
+.collapsible-header.active .collapse-icon {
+    transform: rotate(180deg);
+    padding-right: 1.5em;
+}
+.collapse-icon {
+    font-size: 12px;
+    transition: transform 0.3s ease;
 }
 
 
@@ -741,6 +771,108 @@
     .goals-row { flex-wrap: wrap; justify-content: center; }
     .explore-row { flex-wrap: wrap; }
   }
+
+/* =========================================================
+   SIDEBAR PARITY FIXES — ported from landing_page_dev.html
+   ========================================================= */
+
+
+  .sidebar-item.active {
+  position: relative;
+  background: #fff;
+  border-radius: 15px 10px 0px 15px;
+  margin-left: 8px;
+  margin-right: -6px;
+  padding: 6px 8px;
+  z-index: 2;
+}
+
+.sidebar-item.active::before {
+  content: "";
+  position: absolute;
+  left: -5px;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  background: #19b394;
+  border-radius: 15px 0 0 15px;
+}
+
+.sidebar-item.active img {
+  filter: none;
+}
+
+.sidebar-item.active > div:not(.icon-wrap) a {
+  color: #0055b8;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.sidebar-item .icon-wrap {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+}
+
+.sidebar-item:not(.active) {
+  font-weight: 500;
+}
+
+
+
+
+/* ── CARD & TYPE FIXES ── */
+
+.goal-label {
+  font-size: 11px;
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.policy-name {
+  font-size: 13px;
+}
+
+.goal-app {
+  height: auto;
+  min-height: 150px;
+}
+
+.tag {
+  white-space: normal;
+  line-height: 1.35;
+}
+
+.sidebar-item {
+  font-size: 9px;
+}
+
+.ess-title { font-size: 18px; }
+.ess-subtitle { font-size: 14px; }
+.search-bar-left { height: 42px; }
+.search-bar-left input { font-size: 13px; }
+
+.btn-explore.primary {
+  font-size: 13px;
+  background: #14b495;
+  color: #fff;
+  font-weight: 600;
+}
+.btn-explore.primary:hover {
+  background: #14b495;
+  color: #fff;
+}
+
+.tag { color: rgba(0, 0, 0, 0.8); line-height: 1.4em; margin-bottom:2px; }
+
+.hr-operations-hub{
+  padding: 0 14px 16px;
+  margin-top: 3em;
+}
+.hr-operations-hub img{
+  border-radius: 10px;
+}
+
 </style>
 </head>
 <body>
@@ -749,11 +881,11 @@
 <nav class="sidebar">
 
 <!-- Home -->
-<div class="sidebar-item active">
+<div class="sidebar-item">
   
   <div class="icon-wrap">
     <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-home&/home" target="_blank">
-      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/1faa139304f94b208c1f/home.png" alt="Home">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/100f3ecfc44c4646b7dd/blackhomme.png" alt="Home">
     </a>
   </div>
 
@@ -766,11 +898,11 @@
 </div>
 
 <!-- Employee Self-Service -->
-<div class="sidebar-item" style="margin-top:8px;">
+<div class="sidebar-item active" style="margin-top:8px;">
   
   <div class="icon-wrap">
     <a href="https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#cipla-ess?sap-app-origin-hint=&sap-ui-app-id-hint=07cf8232-43ea-4503-8271-abc159f70dc2" target="_blank">
-      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/adfd108c0f1144938bad/ess.png" alt="Employee Self-Service">
+      <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/fac440de07c24d639f56/blueess.png" alt="Employee Self-Service">
     </a>
   </div>
 
@@ -892,15 +1024,15 @@
       <!-- People & Organization -->
       <div class="lower-card">
 
-          <div class="lower-card-title collapsible-header"
+          <div class="lower-card-title collapsible-header active"
               onclick="toggleSection('peopleOrgSection', this)">
               <span>People &amp; Organization</span>
-              <span class="collapse-icon">⌃</span>
+              <span class="collapse-icon"><img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/5082bd24ba5c42748d7a/accordionicon.png" width="20"></span>
           </div>
 
-          <div id="peopleOrgSection" class="collapsible-content">
+          <div id="peopleOrgSection" class="collapsible-content open">
 
-              <div class="goals-row" style="grid-template-columns: repeat(6, auto);">
+              <div class="goals-row" style="grid-template-columns: repeat(6, 15.66%);">
 
                   <div class="goal-app"
                       data-search="Annual Assesment, 180 feedback, LeadX"
@@ -993,7 +1125,7 @@
           <div class="lower-card-title collapsible-header"
               onclick="toggleSection('learningSection', this)">
               <span>Learning</span>
-              <span class="collapse-icon">⌃</span>
+              <span class="collapse-icon"><img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/5082bd24ba5c42748d7a/accordionicon.png" width="20"></span>
           </div>
 
           <div id="learningSection" class="collapsible-content">
@@ -1046,7 +1178,7 @@
           <div class="lower-card-title collapsible-header"
               onclick="toggleSection('careersSection', this)">
               <span>Careers</span>
-              <span class="collapse-icon">⌃</span>
+              <span class="collapse-icon"><img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/5082bd24ba5c42748d7a/accordionicon.png" width="20"></span>
           </div>
 
           <div id="careersSection" class="collapsible-content">
@@ -1122,7 +1254,7 @@
           <div class="lower-card-title collapsible-header"
               onclick="toggleSection('careThriveSection', this)">
               <span>Care &amp; Thrive</span>
-              <span class="collapse-icon">⌃</span>
+              <span class="collapse-icon"><img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/5082bd24ba5c42748d7a/accordionicon.png" width="20"></span>
           </div>
 
           <div id="careThriveSection" class="collapsible-content">
@@ -1177,7 +1309,7 @@
           <div class="lower-card-title collapsible-header"
               onclick="toggleSection('financialSupportSection', this)">
               <span>Financial &amp; Support</span>
-              <span class="collapse-icon">⌃</span>
+              <span class="collapse-icon"><img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/5082bd24ba5c42748d7a/accordionicon.png" width="20"></span>
           </div>
 
           <div id="financialSupportSection" class="collapsible-content">
@@ -1242,7 +1374,7 @@
           <div class="lower-card-title collapsible-header"
               onclick="toggleSection('hrToolsSection', this)">
               <span>HR Tools</span>
-              <span class="collapse-icon">⌃</span>
+              <span class="collapse-icon"><img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/5082bd24ba5c42748d7a/accordionicon.png" width="20"></span>
           </div>
 
           <div id="hrToolsSection" class="collapsible-content">
@@ -1331,94 +1463,99 @@
     </div><!-- end left-panel -->
 
     <!-- ════════ RIGHT PANEL — HR Updates Image Carousel ════════ -->
-<div class="right-panel">
+    <div class="right-panel">
 
 
 
-  <!-- ✅ POLICY SECTION START -->
-  <div class="policy-section">
+      <!-- ✅ POLICY SECTION START -->
+      <div class="policy-section">
 
-    <div class="policy-title">Policy Document Updates</div>
+        <div class="policy-title">Policy Document Updates</div>
 
-    <!-- Header -->
-    <div class="policy-header" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/workpage_tabs/ES7lhq0fypRxKa7yELQ024')">
-      <div>
-        <div class="policy-main">MiPolicies</div>
-        <div class="policy-sub">Show All Policies >></div>
+        <!-- Header -->
+        <div class="policy-header" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/workpage_tabs/ES7lhq0fypRxKa7yELQ024')">
+          <div>
+            <div class="policy-main">MiPolicies</div>
+            <div class="policy-sub">Show All Policies >></div>
+          </div>
+
+          <div class="policy-icon">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png">
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="policy-body">
+
+          <!-- Vertical label -->
+          <div class="policy-side">
+            <span>Recent Updates</span>
+          </div>
+
+          <!-- Cards -->
+          <div class="policy-list">
+
+    <div class="policy-card" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/documents/JVeyxQOnbEgdOWSFeGt024/slide_viewer')">
+
+        <div class="policy-doc-icon">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png" alt="doc">
+        </div>
+
+        <div class="policy-content">
+            <div class="policy-name">Domestic Travel Policy</div>
+        </div>
+
+        <div class="policy-arrow">
+            <svg width="12" height="20" viewBox="0 0 12 20">
+                <path d="M2 2L10 10L2 18"
+                      fill="none"
+                      stroke="#A9A9A9"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+    </div>
+
+    <div class="policy-card" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/documents/vuI0pZQuCCPpgScTD4Z024/slide_viewer')">
+
+        <div class="policy-doc-icon">
+            <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png" alt="doc">
+        </div>
+
+        <div class="policy-content">
+            <div class="policy-name">International Travel Policy</div>
+        </div>
+
+        <div class="policy-arrow">
+            <svg width="12" height="20" viewBox="0 0 12 20">
+                <path d="M2 2L10 10L2 18"
+                      fill="none"
+                      stroke="#A9A9A9"
+                      stroke-width="3"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+    </div>
+
+          </div>
+        </div>
+
+      </div>
+      <!-- ✅ POLICY SECTION END -->
+
+      <div class="hr-operations-hub">
+          <div class="policy-title">HR Operations Hub</div>
+          <a href="#"><img src="hr-operations-hub.png" width="100%"></a>
       </div>
 
-      <div class="policy-icon">
-        <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png">
-      </div>
-    </div>
+    </div><!-- end right-panel -->
 
-    <!-- Body -->
-    <div class="policy-body">
-
-      <!-- Vertical label -->
-      <div class="policy-side">
-        <span>Recent Updates</span>
-      </div>
-
-      <!-- Cards -->
-      <div class="policy-list">
-
-<div class="policy-card" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/documents/JVeyxQOnbEgdOWSFeGt024/slide_viewer')">
-
-    <div class="policy-doc-icon">
-        <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png" alt="doc">
-    </div>
-
-    <div class="policy-content">
-        <div class="policy-name">Domestic Travel Policy</div>
-    </div>
-
-    <div class="policy-arrow">
-        <svg width="12" height="20" viewBox="0 0 12 20">
-            <path d="M2 2L10 10L2 18"
-                  fill="none"
-                  stroke="#A9A9A9"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
-        </svg>
-    </div>
-
-</div>
-
-<div class="policy-card" onclick="openApp('https://workzone-prod-w6v2igr4.workzonehr.cfapps.ap10.hana.ondemand.com/site#workzone-viewAll?sap-app-origin-hint=&/groups/ZH6Bk7yyFsTC7QtqY6J024/documents/vuI0pZQuCCPpgScTD4Z024/slide_viewer')">
-
-    <div class="policy-doc-icon">
-        <img src="https://dmscdn.successfactors.com/e67bac61f74a3e78a20b20c3bff5abd417dd0605df72755f101e24743407f67c/static_content/c1bf6fafa22e42a9979d/mipolicies_nnew.png" alt="doc">
-    </div>
-
-    <div class="policy-content">
-        <div class="policy-name">International Travel Policy</div>
-    </div>
-
-    <div class="policy-arrow">
-        <svg width="12" height="20" viewBox="0 0 12 20">
-            <path d="M2 2L10 10L2 18"
-                  fill="none"
-                  stroke="#A9A9A9"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"/>
-        </svg>
-    </div>
-
-</div>
-
-      </div>
-    </div>
 
   </div>
-  <!-- ✅ POLICY SECTION END -->
-
-</div><!-- end right-panel -->
-
-
-</div>
 </div>
 
 <script>
@@ -1522,15 +1659,17 @@
 
   function toggleSection(sectionId, header) {
     const section = document.getElementById(sectionId);
+
+    section.classList.toggle('open');
+    header.classList.toggle('active');
+
     const icon = header.querySelector('.collapse-icon');
 
-    section.classList.toggle('collapsed');
-
-    if(section.classList.contains('collapsed')){
-        icon.style.transform = 'rotate(180deg)';
+    /*if (section.classList.contains('open')) {
+        icon.innerHTML = '';
     } else {
-        icon.style.transform = 'rotate(0deg)';
-    }
+        icon.innerHTML = '⌄';
+    }*/
   }
 
 
@@ -1660,5 +1799,7 @@
   });
 
 </script>
+
+
 </body>
 </html>
